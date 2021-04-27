@@ -1,0 +1,41 @@
+<%- include('header') -%>
+    <div class="box" id="heading">
+      <h1><%= listTitle %></h1>
+
+    </div>
+    <div class="box" id="heading">
+
+    </div>
+
+    <div class="box">
+
+    <%  newListItems.forEach(function(item){ %>
+      <form  action="/delete" method="post">
+        <div class="item">
+          <ul>
+            <li>
+                <%= item.name %>
+               <button class="btn" type="submit" name="removeItem" value= <%= item._id %>><i class="fa fa-trash"></i></button>
+            </li>
+          </ul>
+
+        </div>
+        <input type="hidden" name="listName" value="<%= listTitle %>"></input>
+      </form>
+
+      <%}) %>
+
+        <form class ="" action="/<%=listTitle %>" method="post">
+            <input type="text" name="newItem" placeholder="New Item" autocomplete="off">
+            <button type="submit" name="addItem" value= <%=listTitle %>>+</button>
+
+
+        </form>
+
+    </div>
+    <div class="box" id="heading">
+      <h3><a href="/">Home</a></h3>
+    </div>
+
+
+<%- include('footer') -%>

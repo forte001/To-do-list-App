@@ -1,0 +1,38 @@
+<%- include('header') -%>
+<div class="box">
+  <form  action="/" method="post">
+    <input type="text" name="newList"  placeholder="Add a new list" autocomplete="off">
+    <button type="submit" name="addNewList">+</button>
+  </form>
+
+</div>
+
+<div class="box" id="heading">
+  <h1>Your To-do lists</h1>
+</div>
+<div class="box">
+  <%if (taskList.length === 0){%>
+    <h2>Your task list will appear here</h2>
+<%  } else {%>
+  <form action="/deleteList" method="post">
+    <%taskList.forEach(function(taskList){%>
+      <div class="">
+        <ul>
+          <li>
+            <h2><a href="/<%=taskList.name%>"><%=taskList.name%></a>
+            <button class="btn" type="submit" name="removeList" value="<%= taskList._id %>" ><i class="fa fa-trash"></i></button>
+
+            </h2>
+
+          </li>
+        </ul>
+      </div>
+    <%})%>
+  <%}%>
+  </form>
+
+
+
+</div>
+
+<%- include('footer') -%>
