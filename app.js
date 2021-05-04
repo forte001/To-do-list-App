@@ -19,49 +19,38 @@ app.set('view engine', 'ejs')
 
 app.use(bodyParser.urlencoded({extended: true}))
 app.use(express.static('public'))
-mongoose.connect("mongodb+srv://Forte001:bKMkgxysGnvaQQcS@cluster0.ayzxm.mongodb.net/myFirstDatabase?retryWrites=true&w=majority", {useNewUrlParser:true, useUnifiedTopology: true});
+mongoose.connect("mongodb+srv://Forte001:bKMkgxysGnvaQQcS@cluster0.ayzxm.mongodb.net/todolistDB", {useNewUrlParser:true, useUnifiedTopology: true, useFindAndModify: false });
 
 const itemSchema = {
-  name:{
+  name:
+  {
     type: String,
     required: [true, "Title field is required"]
   },
 
 }
 
+// Item model
 const Item = mongoose.model("Item", itemSchema);
 
-// const item1 = new Item({
-//   name: "Test item1"
-// });
-//
-// const item2 = new Item({
-//   name: "Test item2"
-// });
-// const item3 = new Item({
-//   name: "Test item3"
-// });
 
-const defaultItems = [];
+const defaultItems = []; // Empty item array for adding task items
 
+// Task list schema
 const taskListSchema = {
-  name: String,
+  name:   {
+      type: String,
+      required: [true, "Name field is required"]
+    },
   items: [itemSchema]
 }
+// Task list model
 const TaskList = mongoose.model("TaskList", taskListSchema);
 
+//
 let taskList = TaskList
 
-// Route for deleting task list
-app.post("/deleteList", function(req,res){
-  selectedListId = req.body.removeList;
-  TaskList.findByIdAndRemove(selectedListId, function(err, removedItem){
-    if (!err){
-    res.redirect("/")
-    }
-  })
 
-})
 
 // Renders the Home page alongside the Task lists in the database
 app.get("/", function(req,res){
@@ -89,7 +78,7 @@ app.post("/", function(req,res){
       // saves the new task list
       taskList.save();
       // Redirects to the new task list
-      res.redirect("/" + newList);
+      res.redirect("/");
 
   } else {
     // This is rendered if task list already exists
@@ -97,10 +86,23 @@ app.post("/", function(req,res){
   }
 }
 })
+
 })
 
+//Renders the items on each task list alongside its items
+app.get("/task", function(req, res){
+  const taskListId = req.body.listId
+  TaskList.findById(taskListId, function(err, foundList){
+    if (!err){
+      res.render("list", {listTitle:foundList, newListItems: foundList.items})
+    }
+  })
+
+})
+
+
 // For adding items to an already created task list
-app.post('/', function(req,res){
+app.post('/task', function(req,res){
 
   const itemName = req.body.newItem;
   const listName = _.capitalize(req.body.addItem);
@@ -110,24 +112,16 @@ app.post('/', function(req,res){
   TaskList.findOne({name:listName}, function(err, foundList){
     if (!err){
       if(!foundList){
-        // Creates a new list
-        taskList = new TaskList({
-          name: newList,
-          items: defaultItems
-      })
-      taskList.save();
-      foundList.items.push(item);
-      foundList.save();
-      res.redirect("/"+ listName);
-      } else {
+        // Redirect to Home where new task list will be created
+        res.redirect("/")
+      } else{
         foundList.items.push(item);
         foundList.save();
-        res.redirect("/"+ listName);
+        res.redirect("/" + listName);
+      }
+    }
 
-    }
-    }
   })
-
 });
 
 // Deletes item(s) from a specific task list
@@ -143,12 +137,22 @@ app.post("/delete", function(req, res){
 
 })
 
+// Route for deleting task list
+app.post("/deleteList", function(req,res){
+  selectedListId = req.body.removeList;
+  TaskList.findByIdAndRemove(selectedListId, function(err, removedItem){
+    if (!err){
+    res.redirect("/")
+    }
+  })
+
+})
 
 
 // Creates task list using routing parameters
 app.get('/:taskListName', function(req,res){
   const taskListName = _.capitalize(req.params.taskListName)
-  //console.log(taskListName);
+  // console.log(taskListName);
   TaskList.findOne({name:taskListName}, function(err, foundList){
     if (!err) {
       if (!foundList){

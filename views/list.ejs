@@ -25,9 +25,10 @@
 
       <%}) %>
 
-        <form class ="" action="/<%=listTitle %>" method="post">
+        <form class ="" action="/task" method="post">
             <input type="text" name="newItem" placeholder="New Item" autocomplete="off">
             <button type="submit" name="addItem" value= <%=listTitle %>>+</button>
+            <input type="hidden" name="listId" value="<%=listTitle._id%>"></input>
 
 
         </form>
